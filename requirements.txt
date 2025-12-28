@@ -9,7 +9,7 @@ billiard
 amqp
 kombu
 vine
-
+psycopg2-binary
 # ML / CV / Data
 numpy
 opencv-python-headless
