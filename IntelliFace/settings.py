@@ -12,6 +12,8 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 from datetime import timedelta
 from pathlib import Path
 import os
+import dj_database_url
+
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
 BASE_DIR = Path(__file__).resolve().parent.parent
@@ -23,7 +25,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 SECRET_KEY = 'django-insecure-u2zz+&d%v-vqytdv2hthycim$oo&x8t(pysrpr86d#9+2)!zes'
 
 # SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = False
+DEBUG = os.getenv("DEBUG", "False") == "True"
 
 ALLOWED_HOSTS = ['127.0.0.1', 'intelliface-production.up.railway.app', '*', '.vercel.app', '10.0.2.2']
 
@@ -100,7 +102,10 @@ DATABASES = {
         'PASSWORD': 'intelliface',
         'HOST': 'localhost',
         'PORT': '5432',
-    }
+    },
+    'default': dj_database_url.config(
+        default=os.getenv("DATABASE_URL")
+    )
 }
 
 # Password validation
