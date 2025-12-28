@@ -9,6 +9,7 @@ from apps.users.models import Snapshot
 
 
 def capture_snapshot(camera, lecture):
+    # import pdb; pdb.set_trace()
     nvr_ip = camera.ip_address
     nvr_username = camera.username
     nvr_password = quote(camera.password, safe="")

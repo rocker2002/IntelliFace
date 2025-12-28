@@ -28,6 +28,7 @@ from apps.core.paginations import paginated_queryset_response
 from django.shortcuts import render
 
 from ..core.recognition import recognize_attendance_from_snapshots_model
+from ..core.tasks import capture_snapshots_for_active_lectures
 
 
 def index(request):
@@ -514,6 +515,7 @@ def start_attendance_api(request):
         if class_id:
             class_obj = Class.objects.filter(id=class_id).first()
             lecture = Lecture.objects.create(class_ref=class_obj)
+            capture_snapshots_for_active_lectures()
             return Response({
                 'id': lecture.id,
                 'start_time': lecture.start_time.isoformat() if lecture.start_time else None,

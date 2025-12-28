@@ -193,7 +193,6 @@ class Course(GenericModel):
 class Lecture(GenericModel):
     id = models.UUIDField(primary_key=True, default=uuid.uuid4, editable=False)
     class_ref = models.ForeignKey(Class, on_delete=models.CASCADE, related_name="lectures")
-    # course = models.ForeignKey(Course, on_delete=models.CASCADE, related_name='lectures')
     start_time = models.DateTimeField(auto_now_add=True)
     end_time = models.DateTimeField(null=True, blank=True)
 
