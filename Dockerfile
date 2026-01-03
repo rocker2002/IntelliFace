@@ -32,5 +32,15 @@ RUN mkdir -p staticfiles
 # Expose port
 EXPOSE $PORT
 
-# Run the application (collectstatic at runtime)
-CMD python manage.py collectstatic --noinput && python manage.py migrate --noinput && gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2
+# Create startup script
+RUN echo '#!/bin/bash\n\
+echo "🚀 Starting IntelliFace..."\n\
+echo "📊 Collecting static files..."\n\
+python manage.py collectstatic --noinput\n\
+echo "🗄️ Running migrations..."\n\
+python manage.py migrate --noinput || echo "⚠️ Migration failed, continuing..."\n\
+echo "🌐 Starting Gunicorn..."\n\
+exec gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120\n' > /app/start.sh && chmod +x /app/start.sh
+
+# Run the application
+CMD ["/app/start.sh"]

@@ -98,26 +98,26 @@ WSGI_APPLICATION = 'IntelliFace.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.sqlite3',
-#         'NAME': BASE_DIR / 'db.sqlite3',
-#     }
-# }
+# Debug environment variables
+print("=== ENVIRONMENT VARIABLES DEBUG ===")
+print(f"DATABASE_URL exists: {bool(os.getenv('DATABASE_URL'))}")
+print(f"RAILWAY_DATABASE_URL exists: {bool(os.getenv('RAILWAY_DATABASE_URL'))}")
+print(f"DB_URL exists: {bool(os.getenv('DB_URL'))}")
+print(f"All env vars starting with 'DATA': {[k for k in os.environ.keys() if k.startswith('DATA')]}")
+print(f"All env vars starting with 'RAIL': {[k for k in os.environ.keys() if k.startswith('RAIL')]}")
+print("=====================================")
 
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME': 'intelliface_db',
-#         'USER': 'intelliface',
-#         'PASSWORD': 'intelliface',
-#         'HOST': 'localhost',
-#         'PORT': '5432',
-#     }
-# }
+# Try multiple possible database URL environment variables
+database_url = (
+    os.getenv("DATABASE_URL") or 
+    os.getenv("RAILWAY_DATABASE_URL") or 
+    os.getenv("DB_URL") or
+    "postgresql://postgres:wvgmVfaDsjWoJEteQwLEXKrICUEZjXiG@metro.proxy.rlwy.net:16471/railway"
+)
+
 DATABASES = {
     'default': dj_database_url.config(
-        default=os.getenv("DATABASE_URL"),
+        default=database_url,
         conn_max_age=600,
         ssl_require=True
     )
