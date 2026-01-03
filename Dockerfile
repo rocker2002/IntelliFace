@@ -10,20 +10,24 @@ ENV PORT=8000
 WORKDIR /app
 
 # Install system dependencies
-RUN apt-get update \
-    && apt-get install -y --no-install-recommends \
-        postgresql-client \
-        build-essential \
-        libpq-dev \
+RUN apt-get update && apt-get install -y \
+    postgresql-client \
+    build-essential \
+    libpq-dev \
     && rm -rf /var/lib/apt/lists/*
 
-# Install Python dependencies
+# Copy requirements first for better caching
 COPY requirements.txt .
-RUN pip install --no-cache-dir --upgrade pip
-RUN pip install --no-cache-dir -r requirements.txt
+
+# Install Python dependencies
+RUN pip install --no-cache-dir --upgrade pip && \
+    pip install --no-cache-dir -r requirements.txt
 
 # Copy project
 COPY . .
+
+# Create staticfiles directory
+RUN mkdir -p staticfiles
 
 # Collect static files
 RUN python manage.py collectstatic --noinput
@@ -32,4 +36,4 @@ RUN python manage.py collectstatic --noinput
 EXPOSE $PORT
 
 # Run the application
-CMD ["sh", "-c", "python manage.py migrate --noinput && gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2"]
+CMD python manage.py migrate --noinput && gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2

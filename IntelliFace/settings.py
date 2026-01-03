@@ -45,6 +45,9 @@ STATIC_URL = '/static/'
 # Use WhiteNoise for serving static files
 STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'
 
+# Ensure staticfiles directory exists
+os.makedirs(STATIC_ROOT, exist_ok=True)
+
 
 # Application definition
 
