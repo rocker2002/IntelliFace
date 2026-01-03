@@ -3,9 +3,9 @@
     "builder": "NIXPACKS"
   },
   "deploy": {
-    "startCommand": "python manage.py migrate && python manage.py collectstatic --noinput && gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT",
+    "startCommand": "python manage.py collectstatic --noinput && python manage.py migrate --noinput && gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2",
     "healthcheckPath": "/",
-    "healthcheckTimeout": 100,
+    "healthcheckTimeout": 300,
     "restartPolicyType": "ON_FAILURE",
     "restartPolicyMaxRetries": 10
   }

@@ -1,17 +1,9 @@
-# Temporarily disabled for deployment - ML dependencies causing build issues
-# import cv2
-# import numpy as np
-# from insightface.app import FaceAnalysis
-# from sklearn.metrics.pairwise import cosine_similarity
-from apps.users.models import Student, Snapshot
-import os
-from django.core.files.base import ContentFile
-
+# Temporarily disabled for deployment
+# Original recognition.py moved here until ML dependencies are resolved
 
 def recognize_attendance_from_snapshots_model(lecture=None, output_folder=None, threshold=0.50):
     """
     Placeholder function - ML features temporarily disabled for deployment
-    TODO: Re-enable after successful deployment with proper ML dependencies
     """
     return {
         "attendance": {},
