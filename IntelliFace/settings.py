@@ -230,15 +230,16 @@ EMAIL_HOST_PASSWORD = 'unlk hyyp xetw ynlt'
 CONTACT_EMAIL = EMAIL_HOST_USER
 
 
-CELERY_BROKER_URL = "redis://localhost:6379/0"
-CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
-CELERY_ACCEPT_CONTENT = ['json']
-CELERY_TASK_SERIALIZER = 'json'
-CELERY_RESULT_SERIALIZER = 'json'
+# Celery configuration - temporarily disabled for deployment
+# CELERY_BROKER_URL = "redis://localhost:6379/0"
+# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
+# CELERY_ACCEPT_CONTENT = ['json']
+# CELERY_TASK_SERIALIZER = 'json'
+# CELERY_RESULT_SERIALIZER = 'json'
 
-CELERY_BEAT_SCHEDULE = {
-    "take_snapshots_every_5_minutes": {
-        "task": "apps.core.tasks.capture_snapshots_for_active_lectures",
-        "schedule": 300,
-    }
-}
+# CELERY_BEAT_SCHEDULE = {
+#     "take_snapshots_every_5_minutes": {
+#         "task": "apps.core.tasks.capture_snapshots_for_active_lectures",
+#         "schedule": 300,
+#     }
+# }

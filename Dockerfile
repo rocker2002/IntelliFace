@@ -29,11 +29,8 @@ COPY . .
 # Create staticfiles directory
 RUN mkdir -p staticfiles
 
-# Collect static files
-RUN python manage.py collectstatic --noinput
-
 # Expose port
 EXPOSE $PORT
 
-# Run the application
-CMD python manage.py migrate --noinput && gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2
+# Run the application (collectstatic at runtime)
+CMD python manage.py collectstatic --noinput && python manage.py migrate --noinput && gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2
