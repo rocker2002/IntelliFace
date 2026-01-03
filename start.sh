@@ -1,10 +1,10 @@
 #!/bin/bash
 
-# Run migrations
-python manage.py migrate --noinput
+echo "🚀 Starting IntelliFace application..."
 
-# Collect static files
-python manage.py collectstatic --noinput
+# Run build process
+python build.py
 
 # Start Gunicorn
-exec gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2
+echo "🌐 Starting Gunicorn server..."
+exec gunicorn IntelliFace.wsgi:application --bind 0.0.0.0:$PORT --workers 2 --timeout 120
