@@ -148,7 +148,10 @@ AUTH_USER_MODEL = 'users.User'
 
 STATIC_URL = 'static/'
 
-TEACHER_URL = 'localhost:3000'
+TEACHER_URL = 'http://localhost:3000'
+
+# Frontend URL used to build password-setup links. Configure via FRONTEND_URL env var.
+FRONTEND_URL = os.getenv('FRONTEND_URL', TEACHER_URL)
 
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(days=1),

@@ -8,6 +8,9 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework import serializers
 from .models import Teacher, Student
 from django.db.models import Q
+from django.utils.http import urlsafe_base64_decode
+from django.utils.encoding import force_str
+from django.contrib.auth.tokens import PasswordResetTokenGenerator
 
 class MyTokenObtainPairSerializer(TokenObtainPairSerializer):
 
@@ -177,6 +180,30 @@ class ClassSerializer(serializers.ModelSerializer):
             Camera.objects.create(class_ref=instance, **camera_data)
 
         return instance
+
+
+class SetPasswordSerializer(serializers.Serializer):
+    uid = serializers.CharField()
+    token = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        try:
+            uid = force_str(urlsafe_base64_decode(data.get('uid')))
+            user = User.objects.get(pk=uid)
+        except Exception:
+            raise serializers.ValidationError({'uid': 'Invalid uid'})
+
+        token = data.get('token')
+        token_generator = PasswordResetTokenGenerator()
+        if not token_generator.check_token(user, token):
+            raise serializers.ValidationError({'token': 'Invalid or expired token'})
+
+        # validate password using Django validators
+        validate_password(data.get('password'), user=user)
+
+        data['user'] = user
+        return data
 
 #class CourseSerializer(serializers.ModelSerializer):
  #   instructor = serializers.PrimaryKeyRelatedField(queryset=Teacher.objects.all())

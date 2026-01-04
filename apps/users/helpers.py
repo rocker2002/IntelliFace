@@ -52,3 +52,38 @@ def send_email_confirm_account(user, type_new_acc):
         msg.send()
     except Exception as ex:
         print(ex)
+
+
+def send_teacher_setup_email(user):
+    """Send a password-setup email to a newly created teacher using
+    Django's PasswordResetTokenGenerator and a uid in the link.
+    """
+    from django.conf import settings
+    from django.contrib.auth.tokens import PasswordResetTokenGenerator
+    from django.utils.http import urlsafe_base64_encode
+    from django.utils.encoding import force_bytes
+
+    from_email = settings.CONTACT_EMAIL
+    to = user.email
+
+    token_generator = PasswordResetTokenGenerator()
+    token = token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(str(user.pk)))
+
+    frontend = getattr(settings, 'FRONTEND_URL', None) or getattr(settings, 'TEACHER_URL', '')
+    frontend = frontend.rstrip('/')
+    link = f"{frontend}/set-password?uid={uid}&token={token}"
+
+    subject = 'Set up your IntelliFace account'
+    html_content = f"<p>Hello {user.first_name or user.email},</p>\n"
+    html_content += f"<p>Please set your account password by visiting the link below. This link will expire shortly for security.</p>\n"
+    html_content += f"<p><a href=\"{link}\">Set your password</a></p>\n"
+    html_content += "<p>If you did not expect this email, please ignore it.</p>"
+
+    msg = EmailMultiAlternatives(subject=subject, from_email=from_email, to=[to])
+    msg.attach_alternative(html_content, "text/html")
+    try:
+        msg.send()
+    except Exception as ex:
+        # avoid exposing sensitive errors; log to stdout for now
+        print('Failed to send teacher setup email:', ex)

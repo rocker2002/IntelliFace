@@ -3,6 +3,7 @@ from .views import (MyTokenObtainPairView, MyTokenRefreshView, course_api, cours
                     teacher_by_id_api, reset_password_confirm_link, student_api, student_by_id_api, class_api,
                     class_by_id_api, upload_student_image, course_students_api, course_mark_attendance_api, start_attendance_api, stop_attendance_api,
                     lecture_api, get_attendance_details_by_lecture)
+from .views import set_password_api
 
 app_name = 'users'
 
@@ -17,6 +18,7 @@ urlpatterns = [
     path('student/<str:student_id>/', student_by_id_api, name='student by id api'),
     path('class/<str:class_id>/', class_by_id_api, name='class by id api'),
     path('reset-password-confirm/', reset_password_confirm_link, name='reset_password_confirm_link'),
+    path('set-password/', set_password_api, name='set_password'),
     path('student/<str:student_id>/upload-images/', upload_student_image, name='upload_student_image'),
     path('course/', course_api, name='course api'),
     path('course/<str:course_id>/students/', course_students_api, name='course students api'),

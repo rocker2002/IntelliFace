@@ -16,9 +16,9 @@ from rest_framework_simplejwt.tokens import AccessToken
 from .permissions import IsTeacher
 from ..core.embedding import student_picture_embedding
 
-from .helpers import send_email_confirm_account
+from .helpers import send_email_confirm_account, send_teacher_setup_email
 from .serializers import CourseSerializer, MyTokenRefreshSerializer, MyTokenObtainPairSerializer, StudentImageSerializer, TeacherSerializer, StudentSerializer, \
-    ClassSerializer
+    ClassSerializer, SetPasswordSerializer
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .models import Course, StudentImage, User, Teacher, Student, Class, Lecture, Attendance, StudentCourses
 from apps.core.paginations import paginated_queryset_response
@@ -85,6 +85,8 @@ def user_api(request):
         return paginated_queryset_response(data, request)
 
 
+
+
 @api_view(['PATCH', 'GET', 'DELETE'])
 @authentication_classes([JWTAuthentication])
 @permission_classes([IsAdminUser])
@@ -122,20 +124,34 @@ def teacher_api(request):
         data = request.data.copy()
         if User.objects.filter(email=data['email']).count() > 0:
             raise ValidationError({'msg': "Email already exist"})
-
         data['joining_date'] = datetime.strptime(data['joining_date'], "%Y-%m-%d").date()
         if 'date_of_birth' in data:
             data['date_of_birth'] = datetime.strptime(data['date_of_birth'], "%Y-%m-%d").date()
-        data['is_teacher'] = True
-        data['is_active'] = True
-        password = Teacher.objects.make_random_password()
-        data['password'] = password
 
-        serializer = TeacherSerializer(data=data)
+        # Create teacher account without a password and keep it inactive until setup
+        teacher = Teacher(
+            email=data['email'],
+            first_name=data.get('first_name', ''),
+            last_name=data.get('last_name', ''),
+            phone_number=data.get('phone_number', None),
+            joining_date=data.get('joining_date'),
+            date_of_birth=data.get('date_of_birth', None),
+            department=data.get('department', ''),
+            specialization=data.get('specialization', ''),
+            is_teacher=True,
+            is_active=False,
+            is_staff=True,
+        )
+        teacher.username = teacher.email
+        teacher.set_unusable_password()
+        teacher.save()
 
-        if serializer.is_valid(raise_exception=True):
-            serializer.save()
-            # teacher = Teacher.objects.create(**data)
+        # Send password-setup email to the teacher with a time-limited token
+        try:
+            send_teacher_setup_email(teacher)
+        except Exception:
+            # do not leak details to client; admin can re-send later
+            pass
         # password = Teacher.objects.make_random_password()
         # validate_password(password)
         # serializer.set_password(password)
@@ -217,6 +233,23 @@ def reset_password_confirm_link(request):
         user.save()
         return Response(status=status.HTTP_200_OK)
     return Response(status=status.HTTP_400_BAD_REQUEST)
+
+
+@api_view(['POST'])
+@permission_classes([])
+def set_password_api(request):
+    import pdb;
+    pdb.set_trace()
+    print(request.data)
+    serializer = SetPasswordSerializer(data=request.data)
+    if serializer.is_valid():
+        user = serializer.validated_data['user']
+        password = serializer.validated_data['password']
+        user.set_password(password)
+        user.is_active = True
+        user.save()
+        return Response({'msg': 'Password has been set successfully'}, status=status.HTTP_200_OK)
+    return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 
 @api_view(['POST', 'GET'])
