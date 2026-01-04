@@ -98,22 +98,8 @@ WSGI_APPLICATION = 'IntelliFace.wsgi.application'
 # Database
 # https://docs.djangoproject.com/en/5.1/ref/settings/#databases
 
-# Debug environment variables
-print("=== ENVIRONMENT VARIABLES DEBUG ===")
-print(f"DATABASE_URL exists: {bool(os.getenv('DATABASE_URL'))}")
-print(f"RAILWAY_DATABASE_URL exists: {bool(os.getenv('RAILWAY_DATABASE_URL'))}")
-print(f"DB_URL exists: {bool(os.getenv('DB_URL'))}")
-print(f"All env vars starting with 'DATA': {[k for k in os.environ.keys() if k.startswith('DATA')]}")
-print(f"All env vars starting with 'RAIL': {[k for k in os.environ.keys() if k.startswith('RAIL')]}")
-print("=====================================")
-
-# Try multiple possible database URL environment variables
-database_url = (
-    os.getenv("DATABASE_URL") or 
-    os.getenv("RAILWAY_DATABASE_URL") or 
-    os.getenv("DB_URL") or
-    "postgresql://postgres:wvgmVfaDsjWoJEteQwLEXKrICUEZjXiG@metro.proxy.rlwy.net:16471/railway"
-)
+# Database configuration with Railway fallback
+database_url = os.getenv("DATABASE_URL", "postgresql://postgres:wvgmVfaDsjWoJEteQwLEXKrICUEZjXiG@metro.proxy.rlwy.net:16471/railway")
 
 DATABASES = {
     'default': dj_database_url.config(
@@ -148,7 +134,7 @@ LANGUAGE_CODE = 'en-us'
 
 CORS_ORIGIN_ALLOW_ALL = True
 
-APPEND_SLASH = False
+APPEND_SLASH = True
 
 TIME_ZONE = 'UTC'
 
@@ -230,16 +216,16 @@ EMAIL_HOST_PASSWORD = 'unlk hyyp xetw ynlt'
 CONTACT_EMAIL = EMAIL_HOST_USER
 
 
-# Celery configuration - temporarily disabled for deployment
-# CELERY_BROKER_URL = "redis://localhost:6379/0"
-# CELERY_RESULT_BACKEND = "redis://localhost:6379/0"
-# CELERY_ACCEPT_CONTENT = ['json']
-# CELERY_TASK_SERIALIZER = 'json'
-# CELERY_RESULT_SERIALIZER = 'json'
+# Celery configuration
+CELERY_BROKER_URL = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+CELERY_RESULT_BACKEND = os.getenv("REDIS_URL", "redis://localhost:6379/0")
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
 
-# CELERY_BEAT_SCHEDULE = {
-#     "take_snapshots_every_5_minutes": {
-#         "task": "apps.core.tasks.capture_snapshots_for_active_lectures",
-#         "schedule": 300,
-#     }
-# }
+CELERY_BEAT_SCHEDULE = {
+    "take_snapshots_every_5_minutes": {
+        "task": "apps.core.tasks.capture_snapshots_for_active_lectures",
+        "schedule": 300,
+    }
+}

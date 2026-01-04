@@ -19,7 +19,23 @@ from django.urls import path, include
 from django.http import JsonResponse
 
 def health_check(request):
-    return JsonResponse({"status": "healthy", "service": "IntelliFace"})
+    return JsonResponse({
+        "status": "healthy", 
+        "service": "IntelliFace API",
+        "message": "Welcome to IntelliFace - Face Recognition Attendance System",
+        "endpoints": {
+            "admin": "/admin/",
+            "health": "/health/",
+            "api_root": "/api/",
+            "login": "/api/login",
+            "teachers": "/api/teacher",
+            "students": "/api/student",
+            "courses": "/api/course",
+            "classes": "/api/class",
+            "lectures": "/api/lecture"
+        },
+        "note": "ML features temporarily disabled for deployment"
+    })
 
 urlpatterns = [
     path('', health_check, name='health_check'),

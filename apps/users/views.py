@@ -31,8 +31,22 @@ from ..core.recognition import recognize_attendance_from_snapshots_model
 from ..core.tasks import capture_snapshots_for_active_lectures
 
 
+@api_view(['GET'])
 def index(request):
-    return render(request, 'users/index.html')
+    return Response({
+        "message": "Welcome to IntelliFace API",
+        "status": "healthy",
+        "endpoints": {
+            "admin": "/admin/",
+            "health": "/health/",
+            "api": "/api/",
+            "login": "/api/login",
+            "teachers": "/api/teacher",
+            "students": "/api/student",
+            "courses": "/api/course",
+            "classes": "/api/class"
+        }
+    })
 
 
 class MyTokenObtainPairView(TokenObtainPairView):
